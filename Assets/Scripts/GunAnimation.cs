@@ -7,44 +7,34 @@ public class GunAnimation : MonoBehaviour
     [SerializeField] private Animator _gunAnimator;
     [SerializeField] private Player _player;
 
-    private float _rayDistance = 1.2f;
-    private bool _hitDetected = false;
-    private bool _hideAnimationHasPlayed = true;
-    private bool _bringupAnimationHasPlayed = false;
-    private RaycastHit _hit;
+    private List<Collider> _colliders = new List<Collider>();
+    private bool _hideAnimationHasPlayed = false;
+    private bool _bringupAnimationHasPlayed = true;
 
-    private void Update()
+    private void OnTriggerEnter(Collider other)
     {
-        Physics.Raycast(transform.position, transform.forward, out _hit, _rayDistance);
-
-        CheckCollision(_hit);
-
-        if (_hitDetected == true && _hideAnimationHasPlayed == false)
+        if (other.TryGetComponent<Player>(out Player player))
         {
-            _gunAnimator.Play("HideGun");
-            _hideAnimationHasPlayed = true;
-            _bringupAnimationHasPlayed = false;
-            _player.enabled = false;
+            return;
         }
 
-        if (_hitDetected == false && _bringupAnimationHasPlayed == false)
+        _colliders.Add(other);
+
+        if (_colliders.Count == 1)
         {
-            _gunAnimator.Play("BringUpGun");
-            _hideAnimationHasPlayed = false;
-            _bringupAnimationHasPlayed = true;
-            _player.enabled = true;
+            _gunAnimator.Play("HideGun");
+            _player.enabled = false;
         }
     }
 
-    private void CheckCollision(RaycastHit hit)
+    private void OnTriggerExit(Collider other)
     {
-        if (hit.collider == null || hit.collider.GetComponent<Bullet>())
+        _colliders.Remove(other);
+
+        if (_colliders.Count == 0)
         {
-            _hitDetected = false;
-        }
-        else
-        {
-            _hitDetected = true;
+            _gunAnimator.Play("BringUpGun");
+            _player.enabled = true;
         }
     }
 }

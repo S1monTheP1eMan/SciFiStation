@@ -7,9 +7,15 @@ public class MouseLook : MonoBehaviour
     [SerializeField] private float _mouseSensitivity;
     [SerializeField] private Transform _playerBody;
 
+    private Player _player;
     private float _mouseX;
     private float _mouseY;
     private float _rotationX;
+
+    private void Awake()
+    {
+        _player = _playerBody.GetComponent<Player>();
+    }
 
     private void Start()
     {
@@ -19,12 +25,12 @@ public class MouseLook : MonoBehaviour
 
     private void OnEnable()
     {
-        _playerBody.GetComponent<Player>().Died += OnPlayerDied;
+        _player.Died += OnPlayerDied;
     }
 
     private void OnDisable()
     {
-        _playerBody.GetComponent<Player>().Died -= OnPlayerDied;
+        _player.Died -= OnPlayerDied;
     }
 
     private void Update()
